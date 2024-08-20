@@ -1,9 +1,8 @@
-// useNewsAPI.ts
 import { useQuery } from "@tanstack/react-query";
 import axios from "axios";
-import { QueryParams, NewsAPIResponse } from "../types/types";
+import { NewsAPIResponse, QueryParams } from "../types/types";
 
-const API_KEY = "df90940f1a3c4d22961e898f4ef4aa80"; // Replace with your actual NewsAPI key
+const API_KEY = "df90940f1a3c4d22961e898f4ef4aa80";
 
 const fetchArticles = async (
   queryParams: QueryParams,

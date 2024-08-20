@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import { Grid, Container, Box, Pagination, Tabs, Tab } from "@mui/material";
 import Navbar from "../components/Navbar";
 import Sidebar from "../components/Sidebar";
@@ -11,6 +11,12 @@ const MainView: React.FC = () => {
   const [searchQuery, setSearchQuery] = useState<string>(""); // Initial empty query
   const [selectedSource, setSelectedSource] = useState<string | undefined>();
   const [selectedCategory, setSelectedCategory] = useState<
+    string | undefined
+  >();
+  const [selectedGuardianSource, setSelectedGuardianSource] = useState<
+    string | undefined
+  >();
+  const [selectedGuardianCategory, setSelectedGuardianCategory] = useState<
     string | undefined
   >();
   const [currentPage, setCurrentPage] = useState<number>(1);
@@ -27,13 +33,16 @@ const MainView: React.FC = () => {
     pageSize: 12,
   });
 
-  // Fetch articles from Guardian
   const {
-    data: guardianArticlesData,
+    articles: guardianArticlesData,
+    sections: guardianSections,
+    tags: guardianTags,
     isLoading: guardianLoading,
     isError: guardianError,
   } = useGuardianAPI({
     q: searchQuery || "general",
+    section: selectedGuardianCategory,
+    tag: selectedGuardianSource,
     page: currentPage,
     pageSize: 12,
   });
@@ -52,32 +61,40 @@ const MainView: React.FC = () => {
     isError: sourcesError,
   } = useNewsSources();
 
-  // Extract categories and source options
-  const categories = Array.from(
+  const newsCategories = Array.from(
     new Set(sources?.map((source) => source.category) || []),
-  ); // Unique categories
-  const sourceOptions =
+  );
+  const newsSourceOptions =
     sources?.map((source) => ({ id: source.id, name: source.name })) || []; // Source IDs for filtering
 
-  // Handle search input
   const handleSearch = (query: string) => setSearchQuery(query);
 
-  // Handle filter changes
-  const handleFilter = (type: "category" | "source", value: string) => {
-    if (type === "category") {
-      setSelectedCategory(value);
-      // Filter sources by category
-      const filteredSources = sources?.filter(
-        (source) => source.category === value,
-      );
-      setSelectedSource(filteredSources?.map((source) => source.id).join(","));
-    } else if (type === "source") {
-      setSelectedSource(value);
-      setSelectedCategory(undefined); // Reset category filter when source changes
+  const handleFilter = (
+    type: "category" | "source",
+    value: string | unknown,
+  ) => {
+    if (tabIndex === 0) {
+      if (type === "category") {
+        setSelectedCategory(value as string);
+        const filteredSources = sources?.filter(
+          (source) => source.category === value,
+        );
+        setSelectedSource(
+          filteredSources?.map((source) => source.id).join(","),
+        );
+      } else if (type === "source") {
+        setSelectedSource(value as string);
+        setSelectedCategory(undefined); // Reset category filter when source changes
+      }
+    } else {
+      if (type === "category") {
+        setSelectedGuardianCategory(value as string);
+      } else if (type === "source") {
+        setSelectedGuardianSource(value as string);
+      }
     }
   };
 
-  // Handle page change
   const handlePageChange = (
     event: React.ChangeEvent<unknown>,
     value: number,
@@ -85,7 +102,6 @@ const MainView: React.FC = () => {
     setCurrentPage(value);
   };
 
-  // Handle tab change
   const handleTabChange = (event: React.SyntheticEvent, newValue: number) => {
     setTabIndex(newValue);
     setCurrentPage(1);
@@ -101,15 +117,25 @@ const MainView: React.FC = () => {
             {sourcesError && <div>Error fetching sources</div>}
             {!sourcesLoading && !sourcesError && (
               <Sidebar
-                categories={categories}
-                sources={sourceOptions}
+                categories={
+                  tabIndex === 0
+                    ? newsCategories
+                    : guardianSections?.map((section) => section.id) || []
+                }
+                sources={
+                  tabIndex === 0
+                    ? newsSourceOptions
+                    : guardianTags?.map((tag) => ({
+                        id: tag.id,
+                        name: tag.webTitle,
+                      })) || []
+                }
                 onFilter={handleFilter}
               />
             )}
           </Grid>
           <Grid item xs={12} md={9}>
             <Box sx={{ mb: 2 }}>
-              {/* Tabs for switching between NewsAPI and Guardian */}
               <Tabs
                 value={tabIndex}
                 onChange={handleTabChange}
@@ -124,7 +150,7 @@ const MainView: React.FC = () => {
                 <>
                   {newsLoading && <div>Loading articles...</div>}
                   {newsError && <div>Error fetching articles</div>}
-                  {newsArticles?.map((article) => (
+                  {newsArticles?.map((article: any) => (
                     <ArticleCard key={article.url} article={article} />
                   ))}
                 </>
@@ -138,11 +164,13 @@ const MainView: React.FC = () => {
                       key={article.webUrl}
                       article={{
                         title: article.webTitle,
-                        description: article.fields?.thumbnail
-                          ? "Thumbnail available"
-                          : "No description",
+                        description:
+                          article.fields?.trailText ||
+                          "No description available",
                         url: article.webUrl,
                         urlToImage: article.fields?.thumbnail || null,
+                        publishedAt: article.webPublicationDate,
+                        content: article.fields?.bodyText || "", // Assuming content is available in bodyText
                       }}
                     />
                   ))}

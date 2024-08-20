@@ -12,6 +12,8 @@ interface Article {
   description: string;
   url: string;
   urlToImage: string | null;
+  publishedAt?: string;
+  content?: string;
 }
 
 interface ArticleCardProps {

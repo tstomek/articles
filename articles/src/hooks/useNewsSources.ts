@@ -1,7 +1,7 @@
 import { useQuery } from "@tanstack/react-query";
 import axios from "axios";
 
-const API_KEY = "12d5bdfb12e84e83bfadc0b667f11e6d"; // Replace with your actual NewsAPI key
+const API_KEY = "12d5bdfb12e84e83bfadc0b667f11e6d";
 
 interface Source {
   id: string;

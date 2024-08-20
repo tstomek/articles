@@ -1,6 +1,3 @@
-// src/types/types.ts
-
-// NewsAPI Types
 export interface NewsAPIArticle {
   title: string;
   description: string;
@@ -11,45 +8,66 @@ export interface NewsAPIArticle {
     name: string;
   };
   publishedAt: string;
-  content?: string; // Optional
+  content?: string;
+}
+export interface GuardianArticle {
+  id: string;
+  type: string;
+  sectionId: string;
+  sectionName: string;
+  webPublicationDate: string;
+  webTitle: string;
+  webUrl: string;
+  fields: {
+    headline: string;
+    trailText: string;
+    byline: string;
+    firstPublicationDate: string;
+    bodyText: string;
+    thumbnail: string;
+  };
 }
 
-// Guardian API Types
-export interface GuardianArticle {
+export interface GuardianResponse {
+  response: {
+    status: string;
+    userTier: string;
+    total: number;
+    startIndex: number;
+    pageSize: number;
+    currentPage: number;
+    pages: number;
+    orderBy: string;
+    results: GuardianArticle[];
+  };
+}
+
+export interface GuardianSection {
   id: string;
   webTitle: string;
   webUrl: string;
-  fields?: {
-    thumbnail?: string;
-  };
-  webPublicationDate?: string;
+  apiUrl: string;
+  editions: Array<{
+    id: string;
+    webTitle: string;
+    webUrl: string;
+    apiUrl: string;
+    code: string;
+  }>;
 }
 
-// General Article Type used in the application
-export interface Article {
-  title: string;
-  description: string;
-  url: string;
-  urlToImage: string | null;
-  publishedAt?: string;
-  content?: string; // Optional
-  sourceName?: string; // To handle the source name, when filtering or displaying
-  id?: string; // For key handling in list rendering
-}
-
-// Sidebar Types
-export interface Source {
+export interface GuardianTag {
   id: string;
-  name: string;
-  category: string;
+  type: string;
+  webTitle: string;
+  webUrl: string;
+  apiUrl: string;
+  references: any[];
+  bio: string;
+  bylineImageUrl: string;
+  largeBylineImageUrl: string;
 }
 
-export interface Category {
-  id: string;
-  name: string;
-}
-
-// Custom hooks types
 export interface QueryParams {
   q?: string;
   sources?: string;
@@ -60,16 +78,7 @@ export interface QueryParams {
   page?: number;
   pageSize?: number;
 }
-
-// Response types
 export interface NewsAPIResponse {
   articles: NewsAPIArticle[];
   totalResults: number;
-}
-
-export interface GuardianResponse {
-  response: {
-    results: GuardianArticle[];
-    total: number;
-  };
 }
