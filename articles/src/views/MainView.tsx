@@ -8,7 +8,7 @@ import { useGuardianAPI } from "../hooks/useGuardianApi";
 import { useNewsAPI } from "../hooks/useNewsApi";
 
 const MainView: React.FC = () => {
-  const [searchQuery, setSearchQuery] = useState<string>(""); // Initial empty query
+  const [searchQuery, setSearchQuery] = useState<string>("");
   const [selectedSource, setSelectedSource] = useState<string | undefined>();
   const [selectedCategory, setSelectedCategory] = useState<
     string | undefined
@@ -20,7 +20,7 @@ const MainView: React.FC = () => {
     string | undefined
   >();
   const [currentPage, setCurrentPage] = useState<number>(1);
-  const [tabIndex, setTabIndex] = useState<number>(0); // Add tab index to manage tabs
+  const [tabIndex, setTabIndex] = useState<number>(0);
 
   const {
     data: newsArticlesData,
@@ -53,7 +53,7 @@ const MainView: React.FC = () => {
     tabIndex === 0
       ? newsArticlesData?.totalResults || 0
       : guardianArticlesData?.response.total || 0;
-  const totalPages = Math.ceil(totalResults / 12); // Calculate total pages
+  const totalPages = Math.ceil(totalResults / 12);
 
   const {
     data: sources,
@@ -65,7 +65,7 @@ const MainView: React.FC = () => {
     new Set(sources?.map((source) => source.category) || []),
   );
   const newsSourceOptions =
-    sources?.map((source) => ({ id: source.id, name: source.name })) || []; // Source IDs for filtering
+    sources?.map((source) => ({ id: source.id, name: source.name })) || [];
 
   const handleSearch = (query: string) => setSearchQuery(query);
 
@@ -84,7 +84,7 @@ const MainView: React.FC = () => {
         );
       } else if (type === "source") {
         setSelectedSource(value as string);
-        setSelectedCategory(undefined); // Reset category filter when source changes
+        setSelectedCategory(undefined);
       }
     } else {
       if (type === "category") {
@@ -170,7 +170,7 @@ const MainView: React.FC = () => {
                         url: article.webUrl,
                         urlToImage: article.fields?.thumbnail || null,
                         publishedAt: article.webPublicationDate,
-                        content: article.fields?.bodyText || "", // Assuming content is available in bodyText
+                        content: article.fields?.bodyText || "",
                       }}
                     />
                   ))}
