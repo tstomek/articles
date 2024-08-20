@@ -1,30 +1,13 @@
+// useNewsAPI.ts
 import { useQuery } from "@tanstack/react-query";
 import axios from "axios";
+import { QueryParams, NewsAPIResponse } from "../types/types";
 
-const API_KEY = "12d5bdfb12e84e83bfadc0b667f11e6d";
-
-interface Article {
-  title: string;
-  description: string;
-  url: string;
-  urlToImage: string | null;
-  source: { id: string; name: string };
-}
-
-interface QueryParams {
-  q?: string;
-  sources?: string;
-  language?: string;
-  from?: string;
-  to?: string;
-  sortBy?: "relevancy" | "popularity" | "publishedAt";
-  page?: number;
-  pageSize?: number;
-}
+const API_KEY = "df90940f1a3c4d22961e898f4ef4aa80"; // Replace with your actual NewsAPI key
 
 const fetchArticles = async (
   queryParams: QueryParams,
-): Promise<{ articles: Article[]; totalResults: number }> => {
+): Promise<NewsAPIResponse> => {
   const { data } = await axios.get("https://newsapi.org/v2/everything", {
     params: {
       apiKey: API_KEY,
@@ -45,6 +28,6 @@ export const useNewsAPI = (queryParams: QueryParams) => {
   return useQuery({
     queryKey: ["news", queryParams],
     queryFn: () => fetchArticles(queryParams),
-    enabled: true, // Always enabled to fetch articles
+    enabled: true,
   });
 };
